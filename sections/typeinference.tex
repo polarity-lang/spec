@@ -1,0 +1,77 @@
+
+\subsection{Checking rules}
+\label{subsec:typeinference:check}
+
+\begin{prooftree}
+    \AxiomC{$\normalize{t}{T\rho}$}
+    \AxiomC{$\mathbf{codata}\ T\Xi \{\} \in \Theta$}
+    \AxiomC{$\Gamma \vdash \rho \Leftarrow \Xi$}
+    \AxiomC{$\Gamma; T\rho \vdash o$}
+    \RightLabel{\textsc{Cocase}}
+    \QuaternaryInfC{$\Gamma \vdash \mathbf{cocase}\ \{ \overline{o} \} \Leftarrow t$}
+\end{prooftree}
+
+\begin{prooftree}
+    \AxiomC{$\mathbf{codata}\ T\Xi \{ (z: T\sigma).D\Xi : t \} \in \Theta$}
+    \AxiomC{$\unify(\rho,\sigma) = \psi$}
+    \AxiomC{$\Gamma\psi \vdash \ldots$}
+    \RightLabel{\textsc{Cocase-Ok}}
+    \TrinaryInfC{$\Gamma; T\rho \vdash D\Delta \mapsto e$}
+\end{prooftree}
+
+\begin{prooftree}
+    \AxiomC{$\mathbf{codata}\ T\Xi \{ (z: T\sigma).D\Xi : t \} \in \Theta$}
+    \AxiomC{$\unify(\rho,\sigma) = \text{fail}$}
+    \RightLabel{\textsc{Cocase-Absurd}}
+    \BinaryInfC{$\Gamma; T\rho \vdash D\Delta\ \mathbf{absurd}$}
+\end{prooftree}
+
+\subsection{Inference rules}
+\label{subsec:typeinference:infer}
+
+\begin{prooftree}
+    \AxiomC{$(x : t) \in \Gamma$}
+    \RightLabel{\textsc{Var}}
+    \UnaryInfC{$\Gamma \vdash x : t$}
+\end{prooftree}
+
+\begin{prooftree}
+    \AxiomC{}
+    \RightLabel{\textsc{Type}}
+    \UnaryInfC{$\Gamma \vdash \Type \Rightarrow \Type$}
+\end{prooftree}
+
+\begin{prooftree}
+    \AxiomC{$\mathbf{data}\ T\Delta\ \{\} \in \Theta$}
+    \AxiomC{$\Gamma \vdash \sigma \Leftarrow \Delta$}
+    \RightLabel{\textsc{TyCtor}$_1$}
+    \BinaryInfC{$\Gamma \vdash T\sigma \Rightarrow \Type$}
+\end{prooftree}
+
+\begin{prooftree}
+    \AxiomC{$\mathbf{codata}\ T\Delta\ \{\} \in \Theta$}
+    \AxiomC{$\Gamma \vdash \sigma \Leftarrow \Delta$}
+    \RightLabel{\textsc{TyCtor}$_2$}
+    \BinaryInfC{$\Gamma \vdash T\sigma \Rightarrow \Type$}
+\end{prooftree}
+
+\begin{prooftree}
+    \AxiomC{$\Gamma \vdash e \Leftarrow t$}
+    \RightLabel{\textsc{Annotation}}
+    \UnaryInfC{$\Gamma \vdash (e : t) \Rightarrow t$}
+\end{prooftree}
+
+\begin{prooftree}
+    \AxiomC{$\mathbf{data}\ T\Delta\ \{ K\Xi : T\rho \} \in \Theta$}
+    \AxiomC{$\Gamma \vdash \sigma \Leftarrow \Xi$}
+    \RightLabel{\textsc{Ctor}}
+    \BinaryInfC{$\Gamma \vdash K\sigma \Rightarrow T\rho[\sigma/\Xi]$}
+\end{prooftree}
+
+\begin{prooftree}
+    \AxiomC{$\mathbf{codata}\ T\Delta\ \{ (z : T\rho).D\Xi : t\} \in \Theta$}
+    \AxiomC{$\Gamma \vdash \sigma \Leftarrow \Xi$}
+    \AxiomC{$\Gamma \vdash e \Leftarrow T\rho[\sigma / \Xi]$}
+    \RightLabel{\textsc{Dtor}}
+    \TrinaryInfC{$\Gamma \vdash e.D\sigma \Rightarrow t[\sigma/\Xi][e/z]$}
+\end{prooftree}
