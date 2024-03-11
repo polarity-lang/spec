@@ -1,22 +1,23 @@
 \[
 \begin{array}{lclr}
-    T &\in &\textsc{TypeNames} & \\
-    K &\in &\textsc{ConstructorNames} & \\
-    D &\in &\textsc{DestructorNames} & \\
+    \mathcal{T} &\in &\textsc{TypeNames} & \\
+    \mathcal{K} &\in &\textsc{ConstructorNames} & \\
+    \mathcal{D} &\in &\textsc{DestructorNames} & \\
     x,y,z &\in &\textsc{Variables} & \\[0.15cm]
     % Expressions
+    \rho, \sigma &\Coloneqq & () \mid (e,\sigma) & \emph{Substitution} \\
     e,s,t &\Coloneqq & x & \emph{Variable} \\
     & \mid & \Type & \emph{Universe} \\
-    & \mid & T\sigma & \emph{Type constructor} \\
-    & \mid & K\sigma & \emph{Data constructor} \\
-    & \mid & e.D\sigma & \emph{Codata destructor} \\
-    & \mid & \mathbf{case}\ e\ \mathbf{as}\ x\ \mathbf{return}\ e\  \mathbf{of}\ \{ \overline{a} \} & \emph{Case} \\
-    & \mid & \mathbf{cocase}\ \mathbf{rec}\ x\ \{ \overline{o} \} & \emph{Cocase} \\
-    & \mid & e : e & \emph{Annotation} \\
-    & \mid & ? & \emph{Hole} \\
-    a & \Coloneqq & K\Delta \mapsto e &\emph{Case} \\
-    & \mid & K\Delta\ \mathbf{absurd} &\emph{Absurd case} \\
-    o & \Coloneqq & D\Delta \mapsto e &\emph{Cocase} \\
-    & \mid & D\Delta\ \mathbf{absurd} & \emph{Absurd cocase} \\
+    & \mid & \mathcal{T}\sigma & \emph{Type constructor} \\
+    & \mid & \mathcal{K}\sigma & \emph{Data constructor} \\
+    % & \mid & e.D\sigma & \emph{Codata destructor} \\
+    % & \mid & \mathbf{case}\ e\ \mathbf{as}\ x\ \mathbf{return}\ e\  \mathbf{of}\ \{ \overline{a} \} & \emph{Case} \\
+    % & \mid & \mathbf{cocase}\ \mathbf{rec}\ x\ \{ \overline{o} \} & \emph{Cocase} \\
+    % & \mid & e : e & \emph{Annotation} \\
+    % & \mid & ? & \emph{Hole} \\
+    % a & \Coloneqq & K\Delta \mapsto e &\emph{Case} \\
+    % & \mid & K\Delta\ \mathbf{absurd} &\emph{Absurd case} \\
+    % o & \Coloneqq & D\Delta \mapsto e &\emph{Cocase} \\
+    % & \mid & D\Delta\ \mathbf{absurd} & \emph{Absurd cocase} \\
 \end{array}
 \]

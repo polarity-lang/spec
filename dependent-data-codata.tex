@@ -1,4 +1,4 @@
-\documentclass[acmsmall,review,anonymous]{acmart}
+\documentclass[acmsmall,review,anonymous,nonacm]{acmart}
 \settopmatter{printfolios=true,printccs=false,printacmref=true}
 
 %%
@@ -61,7 +61,6 @@
 \usepackage[]{todonotes}
 \newcommand{\klaus}[2][]{\todo[inline,color=orange,author=Klaus,#1]{#2}}
 \newcommand{\david}[2][]{\todo[inline,color=red!40,author=David,#1]{#2}}
-\newcommand{\ingo}[2][]{\todo[inline,color=blue!40,author=Ingo,#1]{#2}}
 \newcommand{\tim}[2][]{\todo[inline,color=yellow!40,author=Tim,#1]{#2}}
 
 \usepackage{syntax}
@@ -94,13 +93,12 @@
 %%
 %% Title information
 %%
-\title{Dependent Data and Codata Types}
-\subtitle{A Manual}
+\title{Type Inference for Dependent Data and Codata Types}
 
 %%
 %% Keywords
 %%
-\keywords{Dependent Types, Expression Problem, Defunctionalization}
+\keywords{Dependent Types, Type Inference, Implicit Arguments}
 
 %%
 %% CCS Classification
@@ -161,7 +159,7 @@
 %%
 \begin{abstract}
   Most presentations of dependent type theories are based on a builtin set of types, including the function type.
-  We present a type theory only based on dependent data and codata types, and show how to infer types.
+  We present a type theory which is based on dependent data and codata types and show how to infer types for this system.
 \end{abstract}
 
 \maketitle
