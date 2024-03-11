@@ -45,6 +45,33 @@ For notation, we use $\ldots \Rightarrow \ldots$ for inference and $\ldots \Left
 
 \subsection{Type Inference With Implicit Arguments}
 
+We first have to modify the rule for data types in the following way.
+
+\begin{prooftree}
+    \AxiomC{$\vdash \telescope{\Psi}$}
+    \AxiomC{$\forall i : \quad \vdash \telescope{\Xi_i,\Xi'_i,} \quad \Xi_i,\Xi'_i \vdash \rho_i : \Psi$}
+    \RightLabel{\textsc{Data}}
+    \BinaryInfC{$\mathbf{data}\ \mathcal{T}\Psi\ \{\ldots, \mathcal{K}_i \{\Xi_i\}(\Xi'_i) : \mathcal{T}\rho_i, \ldots \}$}
+\end{prooftree}
+
+For the moment we don't allow implicit arguments for type constructors.
+But every constructor comes with a list of implicit arguments and a list of explicit arguments.
+
+\begin{prooftree}
+    \AxiomC{$\sigma\ \mathrm{fresh}$}
+    \AxiomC{$\Gamma \vdash (\sigma,\sigma') \Leftarrow \Xi_i, \Xi'_i$}
+    \RightLabel{\textsc{Ctor-Infer}}
+    \BinaryInfC{$\Gamma \vdash \mathcal{K}_i\{\_\}(\sigma') \Rightarrow \mathcal{T}\rho_i[\sigma,\sigma' / \Xi_i, \Xi'_i]$}
+\end{prooftree}
+
+\begin{prooftree}
+    \AxiomC{$\sigma\ \mathrm{fresh}$}
+    \AxiomC{$\Gamma \vdash (\sigma,\sigma') \Leftarrow \Xi_i, \Xi'_i$}
+    \AxiomC{$\unify(\tau, \mathcal{T}\rho_i[\sigma,\sigma' / \Xi_i, \Xi'_i])$}
+    \RightLabel{\textsc{Ctor-Check}}
+    \TrinaryInfC{$\Gamma \vdash \mathcal{K}_i\{\_\}(\sigma') \Leftarrow \tau$}
+\end{prooftree}
+
 % \subsection{Checking rules}
 % \label{subsec:typeinference:check}
 
