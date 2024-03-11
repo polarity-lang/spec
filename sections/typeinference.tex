@@ -3,20 +3,24 @@ We first specify the rules for the system without implicit arguments, and then f
 
 \subsection{Type Inference Without Implicit Arguments}
 
-Let us first recapitulate how the rules work for constructors without implicit arguments.
+Let us first recapitulate how the rules for constructors without implicit arguments work.
 
 \subsubsection*{Declarative Rules}
 
-We start with the declarative rules for data type declarations.
+We start with the rule \textsc{Data} which checks whether a given data type declaration is wellformed:
 \begin{prooftree}
     \AxiomC{$\vdash \telescope{\Psi}$}
     \AxiomC{$\forall i : \quad \vdash \telescope{\Xi_i} \quad \Xi_i \vdash \rho_i : \Psi$}
     \RightLabel{\textsc{Data}}
     \BinaryInfC{$\mathbf{data}\ \mathcal{T}\Psi\ \{\ldots, \mathcal{K}_i \Xi_i : \mathcal{T}\rho_i, \ldots \}$}
 \end{prooftree}
+In this rule we introduce a new data type $\mathcal{T}$ with parameters/indices $\Psi$.
+Every constructor $\mathcal{K}_i$ of that data type expects a list of arguments which are specified by the telescope $\Xi$ and returns a specific instance $\mathcal{T}\rho_i$ of the data type that is specified by the substitution $\rho_i$ which must typecheck in the context $\Xi_i$.
+In the following rules we always assume that this data definition is implicitly in scope when we specify the rules for constructors.
+This convention allows us to write one premiss less in each of the rules; in a real implementation we have to look up in the program if a data type declaration for the constructor is in scope.
 
-In the following rule we presume the data definition from above to be in scope, so that we don't have to repeat it in all of the premisses.
-The rule for typing constructors is as follows
+
+The rule for typing a constructor $\mathcal{K}_i$ then looks as follows.
 
 \begin{prooftree}
     \AxiomC{$\Gamma \vdash \sigma : \Xi_i$}
@@ -24,11 +28,22 @@ The rule for typing constructors is as follows
     \UnaryInfC{$\Gamma \vdash \mathcal{K}_i\sigma : \mathcal{T}\rho_i[\sigma / \Xi_i]$}
 \end{prooftree}
 
-\subsubsection*{Bidirectional Rules}
+In this rule we have to guarantee that the concrete arguments $\sigma$ which are passed to the constructor $\mathcal{K}_i$ correspond to the types of the arguments $\Xi_i$ that were specified in the data type declaration.
+The resulting return type is then a specialization of the type $\mathcal{T}\rho_i$ of the data type declaration which we obtain by substituting the concrete arguments for the variables in $\Xi_i$.
 
-The rule for data declarations is mostly unchanged, so we don't repeat it here.
-But we now have two rules for constructors.
+\subsubsection*{Bidirectional Rules}
+We now introduce the bidirectional rules for this system.
 For notation, we use $\ldots \Rightarrow \ldots$ for inference and $\ldots \Leftarrow \ldots$ for checking.
+The rule for data declarations is mostly unchanged, except that we now explicitly check the $\rho_i$:
+
+\begin{prooftree}
+    \AxiomC{$\vdash \telescope{\Psi}$}
+    \AxiomC{$\forall i : \quad \vdash \telescope{\Xi_i} \quad \Xi_i \vdash \rho_i \Leftarrow \Psi$}
+    \RightLabel{\textsc{Data}}
+    \BinaryInfC{$\mathbf{data}\ \mathcal{T}\Psi\ \{\ldots, \mathcal{K}_i \Xi_i : \mathcal{T}\rho_i, \ldots \}$}
+\end{prooftree}
+
+The rules for constructors are more interesting, since we now have two rules:
 
 \begin{prooftree}
     \AxiomC{$\Gamma \vdash \sigma \Leftarrow \Xi_i$}
@@ -42,6 +57,9 @@ For notation, we use $\ldots \Rightarrow \ldots$ for inference and $\ldots \Left
     \RightLabel{\textsc{Ctor-Check}}
     \BinaryInfC{$\Gamma \vdash \mathcal{K}_i\sigma \Leftarrow \tau$}
 \end{prooftree}
+
+In the rule \textsc{Ctor-Infer} we can \emph{check} the arguments of the constructor since we know from the data definition what its types must be.
+This is also the case for \textsc{Ctor-Check}, but we now have an additional step where we use unification.
 
 \subsection{Type Inference With Implicit Arguments}
 
