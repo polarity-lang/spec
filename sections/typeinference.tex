@@ -67,7 +67,7 @@ We first have to modify the rule for data types in the following way.
 
 \begin{prooftree}
     \AxiomC{$\vdash \telescope{\Psi}$}
-    \AxiomC{$\forall i : \quad \vdash \telescope{\Xi_i,\Xi'_i,} \quad \Xi_i,\Xi'_i \vdash \rho_i : \Psi$}
+    \AxiomC{$\forall i : \quad \vdash \telescope{\Xi_i,\Xi'_i,} \quad \Xi_i,\Xi'_i \vdash \rho_i \Leftarrow \Psi$}
     \RightLabel{\textsc{Data}}
     \BinaryInfC{$\mathbf{data}\ \mathcal{T}\Psi\ \{\ldots, \mathcal{K}_i \{\Xi_i\}(\Xi'_i) : \mathcal{T}\rho_i, \ldots \}$}
 \end{prooftree}
