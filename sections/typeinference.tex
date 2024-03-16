@@ -1,168 +1,133 @@
-In this section we show how to typecheck constructors applied to arguments.
-We first specify the rules for the system without implicit arguments, and then for the system with implicit arguments.
+In this section we introduce the bidirectional typing rules for the system.
+For every syntactic construct introduced in \cref{sec:syntax} we introduce both a checking and an inference rule.
+We write $\Gamma \vdash e \Rightarrow \tau$ if the type $\tau$ is \emph{inferred} for the expression $e$, and $\Gamma \vdash e \Leftarrow \tau$ if we check that the expression $e$ has the type $\tau$.
+We use the additional judgement $\checkconv{e}{t}$ to check that $e$ and $t$ are convertible.
 
-\subsection{Type Inference Without Implicit Arguments}
+%%
+%% Subsec: Type Universe
+%%
+\subsection{Type Universe}
+\label{subsec:inference:universe}
 
-Let us first recapitulate how the rules for constructors without implicit arguments work.
-
-\subsubsection*{Declarative Rules}
-
-We start with the rule \textsc{Data} which checks whether a given data type declaration is wellformed:
 \begin{prooftree}
-    \AxiomC{$\vdash \telescope{\Psi}$}
-    \AxiomC{$\forall i : \quad \vdash \telescope{\Xi_i} \quad \Xi_i \vdash \rho_i : \Psi$}
-    \RightLabel{\textsc{Data}}
-    \BinaryInfC{$\mathbf{data}\ \mathcal{T}\Psi\ \{\ldots, \mathcal{K}_i \Xi_i : \mathcal{T}\rho_i, \ldots \}$}
+    \AxiomC{}
+    \RightLabel{\textsc{Univ-Infer}}
+    \UnaryInfC{$\Gamma \vdash \Type \Rightarrow \Type$}
 \end{prooftree}
-In this rule we introduce a new data type $\mathcal{T}$ with parameters/indices $\Psi$.
-Every constructor $\mathcal{K}_i$ of that data type expects a list of arguments which are specified by the telescope $\Xi$ and returns a specific instance $\mathcal{T}\rho_i$ of the data type that is specified by the substitution $\rho_i$ which must typecheck in the context $\Xi_i$.
-In the following rules we always assume that this data definition is implicitly in scope when we specify the rules for constructors.
-This convention allows us to write one premiss less in each of the rules; in a real implementation we have to look up in the program if a data type declaration for the constructor is in scope.
-
-
-The rule for typing a constructor $\mathcal{K}_i$ then looks as follows.
 
 \begin{prooftree}
-    \AxiomC{$\Gamma \vdash \sigma : \Xi_i$}
+    \AxiomC{$\checkconv{\tau}{\Type}$}
+    \RightLabel{\textsc{Univ-Check}}
+    \UnaryInfC{$\Gamma \vdash \Type \Leftarrow\tau$}
+\end{prooftree}
+
+%%
+%% Subsec: Variables
+%%
+\subsection{Variables}
+\label{subsec:inference:variables}
+
+\begin{prooftree}
+    \AxiomC{$(x : t) \in \Gamma$}
+    \RightLabel{\textsc{Var}}
+    \UnaryInfC{$\Gamma \vdash x : t$}
+\end{prooftree}
+
+%%
+%% Subsec: Type Annotations
+%%
+\subsection{Type Annotations}
+\label{subsec:inference:type-annotations}
+
+\begin{prooftree}
+    \AxiomC{$\Gamma \vdash e \Leftarrow t$}
+    \RightLabel{\textsc{Annotation}}
+    \UnaryInfC{$\Gamma \vdash (e : t) \Rightarrow t$}
+\end{prooftree}
+
+%%
+%% Subsec: Type Constructors
+%%
+\subsection{Type Constructors}
+\label{subsec:inference:type-constructors}
+
+\begin{prooftree}
+    \AxiomC{$\mathbf{data}\ T\Delta\ \{\} \in \Theta$}
+    \AxiomC{$\Gamma \vdash \sigma \Leftarrow \Delta$}
+    \RightLabel{\textsc{TyCtor}$_1$}
+    \BinaryInfC{$\Gamma \vdash T\sigma \Rightarrow \Type$}
+\end{prooftree}
+
+\begin{prooftree}
+    \AxiomC{$\mathbf{codata}\ T\Delta\ \{\} \in \Theta$}
+    \AxiomC{$\Gamma \vdash \sigma \Leftarrow \Delta$}
+    \RightLabel{\textsc{TyCtor}$_2$}
+    \BinaryInfC{$\Gamma \vdash T\sigma \Rightarrow \Type$}
+\end{prooftree}
+
+
+%%
+%% Subsec: Constructors and Codefinitions
+%%
+\subsection{Constructors and Codefinitions}
+\label{subsec:inference:producers}
+
+\begin{prooftree}
+    \AxiomC{$\mathbf{data}\ T\Delta\ \{ K\Xi : T\rho \} \in \Theta$}
+    \AxiomC{$\Gamma \vdash \sigma \Leftarrow \Xi$}
     \RightLabel{\textsc{Ctor}}
-    \UnaryInfC{$\Gamma \vdash \mathcal{K}_i\sigma : \mathcal{T}\rho_i[\sigma / \Xi_i]$}
+    \BinaryInfC{$\Gamma \vdash K\sigma \Rightarrow T\rho[\sigma/\Xi]$}
 \end{prooftree}
 
-In this rule we have to guarantee that the concrete arguments $\sigma$ which are passed to the constructor $\mathcal{K}_i$ correspond to the types of the arguments $\Xi_i$ that were specified in the data type declaration.
-The resulting return type is then a specialization of the type $\mathcal{T}\rho_i$ of the data type declaration which we obtain by substituting the concrete arguments for the variables in $\Xi_i$.
+%%
+%% Subsec: Destructors and Definitions
+%%
+\subsection{Destructors and Definitions}
+\label{subsec:inference:consumers}
 
-\subsubsection*{Bidirectional Rules}
-We now introduce the bidirectional rules for this system.
-For notation, we use $\ldots \Rightarrow \ldots$ for inference and $\ldots \Leftarrow \ldots$ for checking.
-The rule for data declarations is mostly unchanged, except that we now explicitly check the $\rho_i$:
 
 \begin{prooftree}
-    \AxiomC{$\vdash \telescope{\Psi}$}
-    \AxiomC{$\forall i : \quad \vdash \telescope{\Xi_i} \quad \Xi_i \vdash \rho_i \Leftarrow \Psi$}
-    \RightLabel{\textsc{Data}}
-    \BinaryInfC{$\mathbf{data}\ \mathcal{T}\Psi\ \{\ldots, \mathcal{K}_i \Xi_i : \mathcal{T}\rho_i, \ldots \}$}
+    \AxiomC{$\mathbf{codata}\ T\Delta\ \{ (z : T\rho).D\Xi : t\} \in \Theta$}
+    \AxiomC{$\Gamma \vdash \sigma \Leftarrow \Xi$}
+    \AxiomC{$\Gamma \vdash e \Leftarrow T\rho[\sigma / \Xi]$}
+    \RightLabel{\textsc{Dtor}}
+    \TrinaryInfC{$\Gamma \vdash e.D\sigma \Rightarrow t[\sigma/\Xi][e/z]$}
 \end{prooftree}
 
-The rules for constructors are more interesting, since we now have two rules:
+%%
+%% Subsec: Local Pattern Matches
+%%
+\subsection{Local Pattern Matches}
+\label{subsec:inference:local-match}
+
+%%
+%% Subsec: Local Copattern Matches
+%%
+\subsection{Local Copattern Matches}
+\label{subsec:inference:local-comatch}
+
 
 \begin{prooftree}
-    \AxiomC{$\Gamma \vdash \sigma \Leftarrow \Xi_i$}
-    \RightLabel{\textsc{Ctor-Infer}}
-    \UnaryInfC{$\Gamma \vdash \mathcal{K}_i\sigma \Rightarrow \mathcal{T}\rho_i[\sigma / \Xi_i]$}
-\end{prooftree}
-
-\begin{prooftree}
-    \AxiomC{$\Gamma \vdash \sigma \Leftarrow \Xi_i$}
-    \AxiomC{$\unify(\tau, \mathcal{T}\rho_i[\sigma / \Xi_i])$}
-    \RightLabel{\textsc{Ctor-Check}}
-    \BinaryInfC{$\Gamma \vdash \mathcal{K}_i\sigma \Leftarrow \tau$}
-\end{prooftree}
-
-In the rule \textsc{Ctor-Infer} we can \emph{check} the arguments of the constructor since we know from the data definition what its types must be.
-This is also the case for \textsc{Ctor-Check}, but we now have an additional step where we use unification.
-
-\subsection{Type Inference With Implicit Arguments}
-
-We first have to modify the rule for data types in the following way.
-
-\begin{prooftree}
-    \AxiomC{$\vdash \telescope{\Psi}$}
-    \AxiomC{$\forall i : \quad \vdash \telescope{\Xi_i,\Xi'_i,} \quad \Xi_i,\Xi'_i \vdash \rho_i \Leftarrow \Psi$}
-    \RightLabel{\textsc{Data}}
-    \BinaryInfC{$\mathbf{data}\ \mathcal{T}\Psi\ \{\ldots, \mathcal{K}_i \{\Xi_i\}(\Xi'_i) : \mathcal{T}\rho_i, \ldots \}$}
-\end{prooftree}
-
-For the moment we don't allow implicit arguments for type constructors.
-But every constructor comes with a list of implicit arguments and a list of explicit arguments.
-
-\begin{prooftree}
-    \AxiomC{$\sigma\ \mathrm{fresh}$}
-    \AxiomC{$\Gamma \vdash (\sigma,\sigma') \Leftarrow \Xi_i, \Xi'_i$}
-    \RightLabel{\textsc{Ctor-Infer}}
-    \BinaryInfC{$\Gamma \vdash \mathcal{K}_i\{\_\}(\sigma') \Rightarrow \mathcal{T}\rho_i[\sigma,\sigma' / \Xi_i, \Xi'_i]$}
+    \AxiomC{$\normalize{t}{T\rho}$}
+    \AxiomC{$\mathbf{codata}\ T\Xi \{\} \in \Theta$}
+    \AxiomC{$\Gamma \vdash \rho \Leftarrow \Xi$}
+    \AxiomC{$\Gamma; T\rho \vdash o$}
+    \RightLabel{\textsc{Cocase}}
+    \QuaternaryInfC{$\Gamma \vdash \mathbf{cocase}\ \{ \overline{o} \} \Leftarrow t$}
 \end{prooftree}
 
 \begin{prooftree}
-    \AxiomC{$\sigma\ \mathrm{fresh}$}
-    \AxiomC{$\Gamma \vdash (\sigma,\sigma') \Leftarrow \Xi_i, \Xi'_i$}
-    \AxiomC{$\unify(\tau, \mathcal{T}\rho_i[\sigma,\sigma' / \Xi_i, \Xi'_i])$}
-    \RightLabel{\textsc{Ctor-Check}}
-    \TrinaryInfC{$\Gamma \vdash \mathcal{K}_i\{\_\}(\sigma') \Leftarrow \tau$}
+    \AxiomC{$\mathbf{codata}\ T\Xi \{ (z: T\sigma).D\Xi : t \} \in \Theta$}
+    \AxiomC{$\unify(\rho,\sigma) = \psi$}
+    \AxiomC{$\Gamma\psi \vdash \ldots$}
+    \RightLabel{\textsc{Cocase-Ok}}
+    \TrinaryInfC{$\Gamma; T\rho \vdash D\Delta \mapsto e$}
 \end{prooftree}
 
-% \subsection{Checking rules}
-% \label{subsec:typeinference:check}
+\begin{prooftree}
+    \AxiomC{$\mathbf{codata}\ T\Xi \{ (z: T\sigma).D\Xi : t \} \in \Theta$}
+    \AxiomC{$\unify(\rho,\sigma) = \text{fail}$}
+    \RightLabel{\textsc{Cocase-Absurd}}
+    \BinaryInfC{$\Gamma; T\rho \vdash D\Delta\ \mathbf{absurd}$}
+\end{prooftree}
 
-% \begin{prooftree}
-%     \AxiomC{$\normalize{t}{T\rho}$}
-%     \AxiomC{$\mathbf{codata}\ T\Xi \{\} \in \Theta$}
-%     \AxiomC{$\Gamma \vdash \rho \Leftarrow \Xi$}
-%     \AxiomC{$\Gamma; T\rho \vdash o$}
-%     \RightLabel{\textsc{Cocase}}
-%     \QuaternaryInfC{$\Gamma \vdash \mathbf{cocase}\ \{ \overline{o} \} \Leftarrow t$}
-% \end{prooftree}
-
-% \begin{prooftree}
-%     \AxiomC{$\mathbf{codata}\ T\Xi \{ (z: T\sigma).D\Xi : t \} \in \Theta$}
-%     \AxiomC{$\unify(\rho,\sigma) = \psi$}
-%     \AxiomC{$\Gamma\psi \vdash \ldots$}
-%     \RightLabel{\textsc{Cocase-Ok}}
-%     \TrinaryInfC{$\Gamma; T\rho \vdash D\Delta \mapsto e$}
-% \end{prooftree}
-
-% \begin{prooftree}
-%     \AxiomC{$\mathbf{codata}\ T\Xi \{ (z: T\sigma).D\Xi : t \} \in \Theta$}
-%     \AxiomC{$\unify(\rho,\sigma) = \text{fail}$}
-%     \RightLabel{\textsc{Cocase-Absurd}}
-%     \BinaryInfC{$\Gamma; T\rho \vdash D\Delta\ \mathbf{absurd}$}
-% \end{prooftree}
-
-% \subsection{Inference rules}
-% \label{subsec:typeinference:infer}
-
-% \begin{prooftree}
-%     \AxiomC{$(x : t) \in \Gamma$}
-%     \RightLabel{\textsc{Var}}
-%     \UnaryInfC{$\Gamma \vdash x : t$}
-% \end{prooftree}
-
-% \begin{prooftree}
-%     \AxiomC{}
-%     \RightLabel{\textsc{Type}}
-%     \UnaryInfC{$\Gamma \vdash \Type \Rightarrow \Type$}
-% \end{prooftree}
-
-% \begin{prooftree}
-%     \AxiomC{$\mathbf{data}\ T\Delta\ \{\} \in \Theta$}
-%     \AxiomC{$\Gamma \vdash \sigma \Leftarrow \Delta$}
-%     \RightLabel{\textsc{TyCtor}$_1$}
-%     \BinaryInfC{$\Gamma \vdash T\sigma \Rightarrow \Type$}
-% \end{prooftree}
-
-% \begin{prooftree}
-%     \AxiomC{$\mathbf{codata}\ T\Delta\ \{\} \in \Theta$}
-%     \AxiomC{$\Gamma \vdash \sigma \Leftarrow \Delta$}
-%     \RightLabel{\textsc{TyCtor}$_2$}
-%     \BinaryInfC{$\Gamma \vdash T\sigma \Rightarrow \Type$}
-% \end{prooftree}
-
-% \begin{prooftree}
-%     \AxiomC{$\Gamma \vdash e \Leftarrow t$}
-%     \RightLabel{\textsc{Annotation}}
-%     \UnaryInfC{$\Gamma \vdash (e : t) \Rightarrow t$}
-% \end{prooftree}
-
-% \begin{prooftree}
-%     \AxiomC{$\mathbf{data}\ T\Delta\ \{ K\Xi : T\rho \} \in \Theta$}
-%     \AxiomC{$\Gamma \vdash \sigma \Leftarrow \Xi$}
-%     \RightLabel{\textsc{Ctor}}
-%     \BinaryInfC{$\Gamma \vdash K\sigma \Rightarrow T\rho[\sigma/\Xi]$}
-% \end{prooftree}
-
-% \begin{prooftree}
-%     \AxiomC{$\mathbf{codata}\ T\Delta\ \{ (z : T\rho).D\Xi : t\} \in \Theta$}
-%     \AxiomC{$\Gamma \vdash \sigma \Leftarrow \Xi$}
-%     \AxiomC{$\Gamma \vdash e \Leftarrow T\rho[\sigma / \Xi]$}
-%     \RightLabel{\textsc{Dtor}}
-%     \TrinaryInfC{$\Gamma \vdash e.D\sigma \Rightarrow t[\sigma/\Xi][e/z]$}
-% \end{prooftree}

@@ -1,7 +1,41 @@
-We describe the function $\unify$.
-There are three possible outcomes for unification:
-\begin{enumerate}
-    \item The set of equations can be unified, yielding a mgu: 
-    \item The set of equations can definitely not be unified, yielding a fail.
-    \item The unifier gives up.
-\end{enumerate}
+In this section we describe the unification algorithm that we use to solve sets of equations between expressions.
+In general, there are three possible outcomes of a unification problem.
+The unifier can solve the unification problem and yield a unifier as a definite proof that the two terms can be unified.
+The unifier can also find definite evidence that the two expressions cannot be unified.
+A third possibility is that the unification algorithm gives up, which is always a possibility because the underlying problem of higher-order unification is not decidable in the general case.
+
+Unification is stateful algorithm, and uses a state $\mathcal{U}$ to keep track of various metadata.
+
+\[
+\begin{array}{lclr}
+    \mathcal{C} & \Coloneqq & e = e & \emph{Constraint} \\
+    \mathcal{\theta} & \Coloneqq & \overline{x \mapsto e} & \emph{Unifier} \\
+    \mathcal{U} & \Coloneqq & \{ \text{eqns} : \overline{\mathcal{C}}, \text{cache} :  \overline{\mathcal{C}}, \text{result} : \theta \} & \emph{Unifier State}
+\end{array}
+\]
+
+%%
+%% Subsec: Helper Functions
+%%
+\subsection{Helper Functions}
+\label{subsec:unification:helper}
+
+Todo: Define adding new constraints and adding bindings to the unifier.
+
+%%
+%% Subsec: Solving a Single Constraint
+%%
+\subsection{Solving a Single Constraint}
+\label{subsec:unification:solve}
+
+We write $(\mathcal{U}, \mathcal{C}) \mapsto \mathcal{U}$ for a single step of the constraint solver which solves the constraint C in state U and yields the new state U.
+
+\begin{align*}
+    \solveconstraint{e = e'} & \coloneq \mathcal{U} \quad \text{(if $e \equiv_\alpha e'$)} \\
+    \solveconstraint{x = e} & \coloneq \addbinding{x}{e} \\
+    \solveconstraint{e = x} & \coloneq \addbinding{x}{e} \\
+    \solveconstraint{\Type = \Type} & \coloneq \mathcal{U} \\
+    \solveconstraint{\mathcal{T}_1\sigma_1 = \mathcal{T}_2 \sigma_2} & \coloneq \ldots \\
+    \solveconstraint{K_1\sigma_1 = K_2 \sigma_2} & \coloneq \ldots \\
+    \solveconstraint{e.d\sigma = e.d\sigma} & \coloneqq \ldots \\
+\end{align*}
