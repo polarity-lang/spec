@@ -93,12 +93,13 @@
 %%
 %% Title information
 %%
-\title{Type Inference for Dependent Data and Codata Types}
+\title{Type Inference for Polarity}
+\subtitle{Part 1: The Core System}
 
 %%
 %% Keywords
 %%
-\keywords{Dependent Types, Type Inference, Implicit Arguments}
+\keywords{Dependent Types, Type Inference, Bidirectional Inference}
 
 %%
 %% CCS Classification
@@ -158,8 +159,10 @@
 %% Abstract
 %%
 \begin{abstract}
-  Most presentations of dependent type theories are based on a builtin set of types, including the function type.
-  We present a type theory which is based on dependent data and codata types and show how to infer types for this system.
+  This paper describes the bidirectional type inference algorithm which is used in the implementation of the polarity programming language.
+  Polarity is a dependently-typed programming language whose unique selling point is that it does not contain any builtin-types in its core theory.
+  In particular, the types of functions and dependent functions can be defined by the user as ordinary codata types.
+  This is only possible because the language contains symmetric data and codata types which are equally expressive.
 \end{abstract}
 
 \maketitle

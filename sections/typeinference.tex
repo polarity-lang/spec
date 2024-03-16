@@ -9,17 +9,23 @@ We use the additional judgement $\checkconv{e}{t}$ to check that $e$ and $t$ are
 \subsection{Type Universe}
 \label{subsec:inference:universe}
 
-\begin{prooftree}
-    \AxiomC{}
-    \RightLabel{\textsc{Univ-Infer}}
-    \UnaryInfC{$\Gamma \vdash \Type \Rightarrow \Type$}
-\end{prooftree}
+We assume the \enquote{Type-in-Type} axiom which means that we only have one type universe $\Type$ which is contained in itself.
+This is known to be inconsistent, but simplifies the implementation of the type system; it is also what Haskell currently uses.
 
-\begin{prooftree}
-    \AxiomC{$\checkconv{\tau}{\Type}$}
-    \RightLabel{\textsc{Univ-Check}}
-    \UnaryInfC{$\Gamma \vdash \Type \Leftarrow\tau$}
-\end{prooftree}
+\begin{minipage}{0.45\textwidth}
+    \begin{prooftree}
+        \AxiomC{}
+        \RightLabel{\textsc{Univ-Infer}}
+        \UnaryInfC{$\Gamma \vdash \Type \Rightarrow \Type$}
+    \end{prooftree}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+    \begin{prooftree}
+        \AxiomC{$\checkconv{\tau}{\Type}$}
+        \RightLabel{\textsc{Univ-Check}}
+        \UnaryInfC{$\Gamma \vdash \Type \Leftarrow\tau$}
+    \end{prooftree}
+\end{minipage}
 
 %%
 %% Subsec: Variables
@@ -27,11 +33,23 @@ We use the additional judgement $\checkconv{e}{t}$ to check that $e$ and $t$ are
 \subsection{Variables}
 \label{subsec:inference:variables}
 
-\begin{prooftree}
-    \AxiomC{$(x : t) \in \Gamma$}
-    \RightLabel{\textsc{Var}}
-    \UnaryInfC{$\Gamma \vdash x : t$}
-\end{prooftree}
+The rules for variables are also simple, since we can always look up the type of a variable in the typing context.
+
+\begin{minipage}{0.45\textwidth}
+    \begin{prooftree}
+        \AxiomC{$(x : t) \in \Gamma$}
+        \RightLabel{\textsc{Var-Infer}}
+        \UnaryInfC{$\Gamma \vdash x \Rightarrow t$}
+    \end{prooftree}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+    \begin{prooftree}
+        \AxiomC{$(x : t') \in \Gamma$}
+        \AxiomC{$\checkconv{t}{t'}$}
+        \RightLabel{\textsc{Var-Check}}
+        \BinaryInfC{$\Gamma \vdash x \Leftarrow t$}
+    \end{prooftree}
+\end{minipage}
 
 %%
 %% Subsec: Type Annotations
