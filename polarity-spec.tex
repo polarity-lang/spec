@@ -159,10 +159,10 @@
 %% Abstract
 %%
 \begin{abstract}
-  This paper describes the bidirectional type inference algorithm which is used in the implementation of the polarity programming language.
-  Polarity is a dependently-typed programming language whose unique selling point is that it does not contain any builtin-types in its core theory.
-  In particular, the types of functions and dependent functions can be defined by the user as ordinary codata types.
-  This is only possible because the language contains symmetric data and codata types which are equally expressive.
+  This paper describes the algorithmic type system which is used in the implementation of the polarity language.
+  Polarity implements the core ideas presented by \citet{Binder2024derivingoop}; that paper contains a declarative specification of the type system in the style of Martin-Löf.
+  This document, on the other hand, contains an algorithmic specification which we try to keep as close as possible to the actual implementation.
+  In particular, we describe how the implementation of implicit arguments in terms of metavariables works, and how these metavariables are solved using unification.
 \end{abstract}
 
 \maketitle

@@ -1,9 +1,17 @@
+\begin{definition}[Names and Variables]
+    We use the following metavariables for names and variables.
+    \begin{align*}
+        \mathcal{T} \in \textsc{TypeNames} \qquad
+        \mathcal{K} \in \textsc{ConstructorNames} \qquad
+        \mathcal{D} \in \textsc{DestructorNames}  \\
+        x,y,z \in \textsc{Variables} \qquad
+        \alpha, \beta \in \textsc{MetaVariables} \\
+    \end{align*}
+\end{definition}
+
+\begin{definition}[Syntax of Expressions]
 \[
 \begin{array}{lclr}
-    \mathcal{T} &\in &\textsc{TypeNames} & \\
-    \mathcal{K} &\in &\textsc{ConstructorNames} & \\
-    \mathcal{D} &\in &\textsc{DestructorNames} & \\
-    x,y,z &\in &\textsc{Variables} & \\[0.15cm]
     % Expressions
     \rho, \sigma &\Coloneqq & () \mid (e,\sigma) & \emph{Substitution} \\
     e,s,t &\Coloneqq & x & \emph{Variable} \\
@@ -14,10 +22,12 @@
     & \mid & \mathbf{case}\ e\ \mathbf{as}\ x\ \mathbf{return}\ e\  \mathbf{of}\ \{ \overline{a} \} & \emph{Case} \\
     & \mid & \mathbf{cocase}\ \mathbf{rec}\ x\ \{ \overline{o} \} & \emph{Cocase} \\
     & \mid & e : e & \emph{Annotation} \\
-    & \mid & ? & \emph{Hole} \\
+    & \mid & \alpha[\sigma] & \emph{Metavariable} \\
     a & \Coloneqq & K\Delta \mapsto e &\emph{Case} \\
     & \mid & K\Delta\ \mathbf{absurd} &\emph{Absurd case} \\
     o & \Coloneqq & D\Delta \mapsto e &\emph{Cocase} \\
     & \mid & D\Delta\ \mathbf{absurd} & \emph{Absurd cocase} \\
 \end{array}
 \]
+\end{definition}
+
